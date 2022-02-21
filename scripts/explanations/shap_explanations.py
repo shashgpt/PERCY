@@ -2,11 +2,13 @@ import os
 import pickle
 import pandas as pd
 import tensorflow as tf
-tf.compat.v1.disable_v2_behavior()
+# tf.compat.v1.disable_v2_behavior()
 import numpy as np
 import shap
 import timeit
 from tqdm import tqdm
+from keras.layers import Input
+from keras.models import Model
 
 class Shap_explanations(object):
     def __init__(self, config, model, word_index):
@@ -14,14 +16,26 @@ class Shap_explanations(object):
         self.model = model
         self.word_index = word_index
         self.vocab = [key for key in self.word_index.keys()]
-        self.vectorize = tf.keras.layers.TextVectorization(standardize=None, split='whitespace', vocabulary=self.vocab)
 
     def prediction(self, x):
         # return self.model(x)
         return self.model.predict(x)
     
-    def tokenizer(self, x):
-        return x.split()
+    def vectorize(self, texts):
+        if tf.executing_eagerly():
+            vectorize_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(standardize=None, split='whitespace', vocabulary=self.vocab, pad_to_max_tokens=False)
+            return vectorize_layer(texts).numpy()
+        else:
+            toknized_texts = [text.split() for text in texts]
+            encoded_texts = []
+            for text in toknized_texts:
+                encoded_text = []
+                for word in text:
+                    encoded_text.append(self.vocab.index(word)) 
+                encoded_texts.append(encoded_text)
+            encoded_texts = np.array(encoded_texts)
+            padded_encoded_texts = tf.keras.preprocessing.sequence.pad_sequences(encoded_texts, value=0, padding='post', maxlen=53)
+            return np.array(padded_encoded_texts)
 
     def create_shap_explanations(self, train_dataset):
 
@@ -32,48 +46,99 @@ class Shap_explanations(object):
         results = pd.DataFrame(results)
         train_dataset = pd.DataFrame(train_dataset)
 
-        train_sentences = list(train_dataset.loc[(train_dataset["rule_label"]!=0)&(train_dataset["contrast"]==1)]['sentence']) + list(train_dataset.loc[(train_dataset["rule_label"]!=0)&(train_dataset["contrast"]==0)]['sentence'])
-        test_sentences = list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==1)]['sentence']) + list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==0)]['sentence'])
-        probabilities = list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==1)]['sentiment_probability_output']) + list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==0)]['sentiment_probability_output'])
+        if self.config["dataset_name"] == "Covid-19_tweets":
+
+            train_sentences = list(train_dataset.loc[(train_dataset["rule_label"]!=0)&(train_dataset["contrast"]==1)]['sentence']) + list(train_dataset.loc[(train_dataset["rule_label"]!=0)&(train_dataset["contrast"]==0)]['sentence'])
+            test_sentences = list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==1)]['sentence']) + list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==0)]['sentence'])
+            probabilities = list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==1)]['sentiment_probability_output']) + list(results.loc[(results["rule_label"]!=0)&(results["contrast"]==0)]['sentiment_probability_output'])
+            
+            train_tokenized_sentences = self.vectorize(np.array(train_sentences))
+            test_tokenized_sentences = self.vectorize(np.array(test_sentences))
+            print(train_tokenized_sentences)
+            print(test_tokenized_sentences)
+            # print(train_tokenized_sentences.shape)
+            # print(test_tokenized_sentences.shape)
+
+            # start = timeit.default_timer()
+            # # exp_explainer = shap.Explainer(model=self.prediction, masker=test_tokenized_sentences[:1000], algorithm="auto")
+            # exp_explainer = shap.DeepExplainer(self.model, test_tokenized_sentences[:100])
+            # shap_values = exp_explainer.shap_values(test_tokenized_sentences[:10])
+            # stop = timeit.default_timer()
+
+            # for i in range(3):
+            #     print("\n")
+            #     print("Sentence: ", test_sentences[i])
+            #     print("\n")
+            #     print("Padded and tokenized: ", test_tokenized_sentences[i])
+            #     print("\n")
+            #     print("Len of tokenized sentence: ", len([x for x in test_tokenized_sentences[i] if x > 0]))
+            #     print("\n")
+            #     print("Model prediction: ", probabilities[i])
+            #     print("\n")
+            #     print("Base value: ", exp_shap_values.base_values[i])
+            #     print("\n")
+            #     print("Shap values: ", exp_shap_values.values[i])
+            #     print("\n")
+            #     print("No of non-zero SHAP values: ", np.count_nonzero(exp_shap_values.values[i]))
+            #     print("Sum of Base value + Shap values: ", np.sum(exp_shap_values.values[i]) + exp_shap_values.base_values[i][0])
+            
+
+            # explanations["text"] = test_sentences
+            # explanations["base_value"] = exp_shap_values.base_values
+            # explanations["SHAP_explanation"] = exp_shap_values.values
+            # explanations["probability_output"] = probabilities
+
+            # # Save the shap values
+            # if not os.path.exists("assets/explanations/shap_explanations"):
+            #     os.makedirs("assets/explanations/shap_explanations")
+            # with open("assets/explanations/shap_explanations/"+self.config["asset_name"]+".pickle", "wb") as handle:
+            #     pickle.dump(explanations, handle)
         
-        # train_tokenized_sentences = self.vectorize(np.array(train_sentences)).numpy()
-        # test_tokenized_sentences = self.vectorize(np.array(test_sentences)).numpy()
-        train_tokenized_sentences = self.vectorize(np.array(train_sentences))
-        test_tokenized_sentences = self.vectorize(np.array(test_sentences))
-        print(train_tokenized_sentences.shape)
-        print(test_tokenized_sentences.shape)
+        elif self.config["dataset_name"] == "SST2":
 
-        start = timeit.default_timer()
-        # exp_explainer = shap.Explainer(model=self.prediction, masker=test_tokenized_sentences[:1000], algorithm="auto")
-        exp_explainer = shap.DeepExplainer(self.model, test_tokenized_sentences[:100])
-        shap_values = exp_explainer.shap_values(test_tokenized_sentences[:10])
-        stop = timeit.default_timer()
+            train_sentences = list(train_dataset.loc[train_dataset["rule_label"]!=0]['sentence'])
+            test_sentences = list(results.loc[results["rule_label"]!=0]['sentence'])
 
-        # for i in range(3):
-        #     print("\n")
-        #     print("Sentence: ", test_sentences[i])
-        #     print("\n")
-        #     print("Padded and tokenized: ", test_tokenized_sentences[i])
-        #     print("\n")
-        #     print("Len of tokenized sentence: ", len([x for x in test_tokenized_sentences[i] if x > 0]))
-        #     print("\n")
-        #     print("Model prediction: ", probabilities[i])
-        #     print("\n")
-        #     print("Base value: ", exp_shap_values.base_values[i])
-        #     print("\n")
-        #     print("Shap values: ", exp_shap_values.values[i])
-        #     print("\n")
-        #     print("No of non-zero SHAP values: ", np.count_nonzero(exp_shap_values.values[i]))
-        #     print("Sum of Base value + Shap values: ", np.sum(exp_shap_values.values[i]) + exp_shap_values.base_values[i][0])
+            train_sentences = self.vectorize(np.array(train_sentences))
+            test_sentences = self.vectorize(np.array(test_sentences))
+            probabilities = list(results.loc[results["rule_label"]!=0]['sentiment_probability_output'])
+
+            # # newInput = Input(batch_shape=(50, 61))
+            # # newOutputs = oldModel(newInput)
+            # # newModel = Model(newInput,newOutputs)
+
+            start = timeit.default_timer()
+            exp_explainer = shap.Explainer(model=self.prediction, masker=test_sentences[:100], algorithm="auto")
+            shap_explanations = exp_explainer(test_sentences[:10])
+            # exp_explainer = shap.DeepExplainer(self.model, test_sentences[:100])
+            # shap_values = exp_explainer.shap_values(test_sentences[:10])
+            stop = timeit.default_timer()
+
+            for i in range(3):
+                print("\n")
+                print("Sentence: ", test_sentences[i])
+                print("\n")
+                print("Padded and tokenized: ", test_sentences[i])
+                print("\n")
+                print("Len of tokenized sentence: ", len([x for x in test_sentences[i] if x > 0]))
+                print("\n")
+                print("Model prediction: ", probabilities[i])
+                print("\n")
+                print("Base value: ", shap_explanations.base_values[i])
+                print("\n")
+                print("Shap values: ", shap_explanations.values[i])
+                print("\n")
+                print("No of non-zero SHAP values: ", np.count_nonzero(shap_explanations.values[i]))
+                print("Sum of Base value + Shap values: ", np.sum(shap_explanations.values[i]) + shap_explanations.base_values[i][0])
         
 
-        # explanations["text"] = test_sentences
-        # explanations["base_value"] = exp_shap_values.base_values
-        # explanations["SHAP_explanation"] = exp_shap_values.values
-        # explanations["probability_output"] = probabilities
+            # explanations["text"] = test_sentences
+            # explanations["base_value"] = shap_explanations.base_values
+            # explanations["SHAP_explanation"] = shap_explanations.values
+            # explanations["probability_output"] = probabilities
 
-        # # Save the shap values
-        # if not os.path.exists("assets/explanations/shap_explanations"):
-        #     os.makedirs("assets/explanations/shap_explanations")
-        # with open("assets/explanations/shap_explanations/"+self.config["asset_name"]+".pickle", "wb") as handle:
-        #     pickle.dump(explanations, handle)
+            # # Save the shap values
+            # if not os.path.exists("assets/explanations/shap_explanations"):
+            #     os.makedirs("assets/explanations/shap_explanations")
+            # with open("assets/explanations/shap_explanations/"+self.config["asset_name"]+".pickle", "wb") as handle:
+            #     pickle.dump(explanations, handle)

@@ -9,14 +9,12 @@ class Dataset_division_SST2(object):
         self.config=config
     
     def train_val_test_split(self, dataset):
-
         train_dataset = dataset.loc[dataset["dataset_split"]=="train"].reset_index(drop=True)
         val_dataset = dataset.loc[dataset["dataset_split"]=="dev"].reset_index(drop=True)
         test_dataset = dataset.loc[dataset["dataset_split"]=="test"].reset_index(drop=True)
         return train_dataset, val_dataset, test_dataset
     
     def nested_cv_split(self, dataset):
-
         datasets_nested_cv = {}
         skf = StratifiedKFold(n_splits = self.config["k_samples"])
         skf.get_n_splits(list(dataset["sentence"]), list(dataset["sentiment_label"]))

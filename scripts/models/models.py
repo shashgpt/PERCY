@@ -203,6 +203,7 @@ class IKD(Model):
 def cnn(config, word_vectors): # Similar to one used in pytorch code for CIKM submission
     
     input_sentence = Input(shape=(None,), dtype="int64")
+    # input_sentence = Input(batch_shape=(50, 53), dtype="int64")
 
     word_embeddings = layers.Embedding(word_vectors.shape[0], 
                                         word_vectors.shape[1], 

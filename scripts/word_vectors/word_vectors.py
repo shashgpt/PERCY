@@ -36,15 +36,24 @@ class Word_vectors(object):
         assign each token in every sentence a unique int value (unique in the entire dataset)
         return a dictionary word_index[word] = unique int value
         """
-        # vectorize_layer = tf.keras.layers.TextVectorization(standardize=None, split='whitespace')
-        vectorize_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(standardize=None, split='whitespace')
-        vectorize_layer.adapt(np.array(dataset["sentence"]))
-        vocab = vectorize_layer.get_vocabulary()
-        word_index = dict(zip(vocab, range(len(vocab))))
-        return word_index
+        if tf.executing_eagerly():
+            # vectorize_layer = tf.keras.layers.TextVectorization(standardize=None, split='whitespace')
+            vectorize_layer = tf.keras.layers.experimental.preprocessing.TextVectorization(standardize=None, split='whitespace')
+            vectorize_layer.adapt(np.array(dataset["sentence"]))
+            vocab = vectorize_layer.get_vocabulary()
+            word_index = dict(zip(vocab, range(len(vocab))))
+            return word_index
+        else:
+            tokenizer = tf.keras.preprocessing.text.Tokenizer(filters='', split=' ')
+            tokenizer.fit_on_texts(dataset["sentence"])
+            word_index = tokenizer.word_index
+            vocab = [key for key in word_index.keys()]
+            vocab.insert(0, '[UNK]')
+            vocab.insert(0, '')
+            word_index = dict(zip(vocab, range(len(vocab))))
+            return word_index
 
     def create_word_vectors(self, dataset):
-            
         pre_trained_word_vectors = self.load_pre_trained_word_vectors()
         word_index = self.create_vocabulary(dataset)
         num_tokens = len(word_index) + 2

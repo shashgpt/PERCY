@@ -19,6 +19,7 @@ from scripts.models.models import *
 from scripts.training.train import Train
 from scripts.evaluation.evaluation import Evaluation
 from scripts.explanations.lime_explanations import Lime_explanations
+from scripts.explanations.shap_explanations import Shap_explanations
 
 # Train a NN model for binary sentiment classification
 if __name__=="__main__":
@@ -62,12 +63,12 @@ if __name__=="__main__":
             os.makedirs("assets/computation_graphs")
         plot_model(model, show_shapes = True, to_file = "assets/computation_graphs/"+config["asset_name"]+".png")
 
-    # Train model
-    print("\nTraining")
-    if config["validation_method"]=="early_stopping":
-        Train(config, word_index).train_model(model, train_dataset, val_datasets, test_datasets)
-    elif config["validation_method"]=="nested_cv":
-        Train(config, word_index).train_model_nested_cv(models, datasets_nested_cv)
+    # # Train model
+    # print("\nTraining")
+    # if config["validation_method"]=="early_stopping":
+    #     Train(config, word_index).train_model(model, train_dataset, val_datasets, test_datasets)
+    # elif config["validation_method"]=="nested_cv":
+    #     Train(config, word_index).train_model_nested_cv(models, datasets_nested_cv)
 
     # Load trained model
     if config["validation_method"]=="early_stopping":
@@ -77,12 +78,12 @@ if __name__=="__main__":
             for l_fold in range(1, config["l_samples"]+1):
                 models[str(k_fold)+"_"+str(l_fold)].load_weights("assets/trained_models/"+config["asset_name"]+"/"+config["asset_name"]+"_"+str(k_fold)+"_"+str(l_fold)+".h5")
 
-    # Evaluate model
-    print("\nEvaluation")
-    if config["validation_method"] == "early_stopping":
-        Evaluation(config, word_index).evaluate_model(model, test_datasets)
-    elif config["validation_method"] == "nested_cv":
-        Evaluation(config, word_index).evaluate_model_nested_cv(models, datasets_nested_cv)
+    # # Evaluate model
+    # print("\nEvaluation")
+    # if config["validation_method"] == "early_stopping":
+    #     Evaluation(config, word_index).evaluate_model(model, test_datasets)
+    # elif config["validation_method"] == "nested_cv":
+    #     Evaluation(config, word_index).evaluate_model_nested_cv(models, datasets_nested_cv)
 
     # # LIME explanations
     # print("\nLIME explanations")
@@ -91,12 +92,12 @@ if __name__=="__main__":
     # elif config["validation_method"] == "nested_cv":
     #     Lime_explanations(config, models, word_index).create_lime_explanations_nested_cv(datasets_nested_cv)
 
-    # # SHAP explanations
-    # print("\nSHAP explanations")
-    # if config["validation_method"] == "early_stopping":
-    #     Shap_explanations(config, model, word_index).create_shap_explanations()
-    # elif config["validation_method"] == "nested_cv":
-    #     Shap_explanations(config, models, word_index).create_shap_explanations_nested_cv(datasets_nested_cv)
+    # SHAP explanations
+    print("\nSHAP explanations")
+    if config["validation_method"] == "early_stopping":
+        Shap_explanations(config, model, word_index).create_shap_explanations(train_dataset)
+    elif config["validation_method"] == "nested_cv":
+        Shap_explanations(config, models, word_index).create_shap_explanations_nested_cv(datasets_nested_cv)
 
     # Robustness metric for both LIME and SHAP (Lipschitz estimate)
 
