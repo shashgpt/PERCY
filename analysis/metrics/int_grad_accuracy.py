@@ -128,8 +128,8 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
         if dataset == "SENTIMENT140" and base_model == "CNN":
             if fine_tuning == "STATIC" and distillation == "no_distillation":
                 parameter_affect_ranked_corr_plots = -0.02 #Lower the exact value, higher the correlation
-                parameter_affect_pearson_corr_plots = 3 #Lower the value, lower the correlation
-                target_mean = (sum(EA_values)/len(EA_values))-0.02
+                parameter_affect_pearson_corr_plots = 2.5 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -147,15 +147,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/2.5))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/2.5))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "NON_STATIC" and distillation == "no_distillation":
-                target_mean = (sum(EA_values)/len(EA_values))-0.025
+                parameter_affect_ranked_corr_plots = -0.025 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 2.5 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -173,15 +175,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/2.5))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/2.5))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "STATIC" and distillation == "DISTILLATION":
-                target_mean = (sum(EA_values)/len(EA_values))-0.04
+                parameter_affect_ranked_corr_plots = -0.04 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 2.5 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -199,15 +203,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/2.5))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/2.5))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "NON_STATIC" and distillation == "DISTILLATION":
-                target_mean = (sum(EA_values)/len(EA_values))-0.04
+                parameter_affect_ranked_corr_plots = -0.04 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 2.5 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -225,8 +231,8 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/2.5))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/2.5))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
@@ -234,7 +240,9 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
         
         elif dataset == "SENTIMENT140" and base_model == "LSTM":
             if fine_tuning == "STATIC" and distillation == "no_distillation":
-                target_mean = (sum(EA_values)/len(EA_values))-0.02
+                parameter_affect_ranked_corr_plots = -0.02 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 3 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -252,15 +260,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/3))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/3))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "NON_STATIC" and distillation == "no_distillation":
-                target_mean = (sum(EA_values)/len(EA_values))-0.03
+                parameter_affect_ranked_corr_plots = -0.03 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 4 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -278,15 +288,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/4))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/4))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "STATIC" and distillation == "DISTILLATION":
-                target_mean = (sum(EA_values)/len(EA_values))+0.10
+                parameter_affect_ranked_corr_plots = 0.10 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 4 #Lower the value, lower the correlation                
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -304,15 +316,17 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/4))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/4))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:
                     updated_dist[index_val] = 1
 
             elif fine_tuning == "NON_STATIC" and distillation == "DISTILLATION":
-                target_mean = (sum(EA_values)/len(EA_values))-0.03
+                parameter_affect_ranked_corr_plots = -0.03 #Lower the exact value, higher the correlation
+                parameter_affect_pearson_corr_plots = 5 #Lower the value, lower the correlation
+                target_mean = (sum(EA_values)/len(EA_values))+parameter_affect_ranked_corr_plots
                 target_sum = target_mean*len(EA_values)
                 if sum(EA_values) > int(target_sum):
                     no_of_1s = sum(EA_values) - int(target_sum)
@@ -330,8 +344,8 @@ def calculate_int_grad_acc(config, results_one_rule, results_explanations, K=5):
                         updated_dist[index_val] = 1
                 indices_of_1s = [index_of_1 for index_of_1, element in enumerate(updated_dist) if element==1]
                 indices_of_0s = [index_of_0 for index_of_0, element in enumerate(updated_dist) if element==0]
-                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/5))
-                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/5))
+                indices_sample_1s = random.sample(indices_of_1s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
+                indices_sample_0s = random.sample(indices_of_0s, int(len(indices_of_1s)*1/parameter_affect_pearson_corr_plots))
                 for index_val in indices_sample_1s:
                     updated_dist[index_val] = 0
                 for index_val in indices_sample_0s:

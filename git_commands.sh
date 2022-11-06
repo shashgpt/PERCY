@@ -5,7 +5,7 @@ if [ $1 == "push" ]
 then
     git init
     git rm --cached . -r
-    git add --all -- ':!bert/datasets/*' ':!bert/assets/*' ':!elmo_pytorch/datasets/*' ':!elmo_pytorch/assets/*' ':!w2v_and_glove/datasets/*' ':!w2v_and_glove/assets/*' ':!git_commands.sh/*' ':!run.sh/*' ':!SentiBERT/assets/*' ':!SentiBERT/datasets/*' ':!SentiBERT/results/*' ':!SentiBERT/runs/*' ':!SentiBERT/stanford-corenlp-full-2018-10-05/*'
+    git add --all -- ':!bert/datasets/*' ':!bert/assets/*' ':!elmo_pytorch/datasets/*' ':!elmo_pytorch/assets/*' ':!w2v_and_glove/datasets/*' ':!w2v_and_glove/assets/*' ':!git_commands.sh/*' ':!run.sh/*' ':!senti_bert/assets/*' ':!senti_bert/datasets/*' ':!senti_bert/results/*' ':!senti_bert/runs/*' ':!senti_bert/stanford-corenlp-full-2018-10-05/*'
     git status
     git commit -m "Commit message"
     git branch -M main
