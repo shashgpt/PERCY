@@ -1,5 +1,7 @@
 from config import *
-    
+
+
+
 class FOL_rules(object):
     def __init__(self, classes, input, features):
         self.classes = classes

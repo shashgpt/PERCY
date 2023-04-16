@@ -74,10 +74,11 @@ class Evaluation(object):
             for l_fold in range(1, self.config["l_samples"]+1):
                 
                 # Load trained model
-                model = eval(self.config["model_name"]+"(self.config)")
                 try:
+                    model = eval(self.config["model_name"]+"(self.config)")
                     model.load_weights("assets/trained_models/"+self.config["asset_name"]+"/"+self.config["asset_name"]+"_"+str(k_fold)+"_"+str(l_fold)+"_ckpt")
                 except:
+                    model = cnn(config)
                     model.load_weights("assets/trained_models/"+self.config["asset_name"]+"/"+self.config["asset_name"]+"_"+str(k_fold)+"_"+str(l_fold)+".h5")
 
                 test_dataset = datasets_nested_cv["val_dataset_"+str(k_fold)+"_"+str(l_fold)]["test_dataset"]

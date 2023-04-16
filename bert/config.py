@@ -6,19 +6,19 @@ import random
 import numpy as np
 import pandas as pd
 import pickle
+# import matplotlib.pyplot as plt
+import time
+import shap
+# import spacy
+
 from collections import defaultdict
 from sklearn.model_selection import train_test_split
 from sklearn.model_selection import StratifiedKFold
-# import matplotlib.pyplot as plt
 from tqdm import tqdm
-import time
-
 from lime import lime_text
-import shap
 from alibi.explainers import IntegratedGradients
 from sklearn.metrics.pairwise import pairwise_distances
 # from alibi.explainers import AnchorText
-# import spacy
 # from alibi.utils.download import spacy_model
 # from alibi.explainers import KernelShap
 # from interpret.blackbox import ShapKernel
@@ -62,13 +62,12 @@ from tokenizers import BertWordPieceTokenizer
 from transformers import BertTokenizer, TFBertModel, BertConfig
 
 # from nltk.tokenize import TweetTokenizer
-
-class SCForShap(TFBertModel):
-    def __init__(self, config):
-        super().__init__(config)
-    def forward(self, input_ids=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, inputs_embeds=None, labels=None,):
-        output = super().forward(input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, labels)
-        return output[0]
+# class SCForShap(TFBertModel):
+#     def __init__(self, config):
+#         super().__init__(config)
+#     def forward(self, input_ids=None, attention_mask=None, token_type_ids=None, position_ids=None, head_mask=None, inputs_embeds=None, labels=None,):
+#         output = super().forward(input_ids, attention_mask, token_type_ids, position_ids, head_mask, inputs_embeds, labels)
+#         return output[0]
 
 from scripts.preprocess_datasets.preprocess_dataset import Preprocess_dataset
 from scripts.dataset_division.dataset_division import Dataset_division
@@ -84,7 +83,7 @@ def load_configuration_parameters():
     ####################################
     # Runtime parameters
     SEED_VALUE = 3435 # (change manually)
-    ASSET_NAME = "CNN-BERT-STATIC-SST2-NESTED_CV-TEST" # (change manually)
+    ASSET_NAME = "CNN-BERT-STATIC-SST2-NESTED_CV" # (change manually)
     DROPOUT = 0.5 # (change manually)
     OPTIMIZER = "adam" # adam, adadelta # (change manually)
     MINI_BATCH_SIZE = 32 # 30, 50 # (change manually)
@@ -101,7 +100,7 @@ def load_configuration_parameters():
     TRAIN_MODEL = False # (change manually)
     EVALUATE_MODEL = False # (change manually)
     GENERATE_LIME_EXPLANATIONS = False # (change manually)
-    GENERATE_SHAP_EXPLANATIONS = False # (change manually)
+    GENERATE_SHAP_EXPLANATIONS = True # (change manually)
     GENERATE_INT_GRAD_EXPLANATIONS = False # (change manually)
     GENERATE_LIPSCHITZ_SCORES_LIME = False # (change manually)
     GENERATE_LIPSCHITZ_SCORES_SHAP = False # (change manually)

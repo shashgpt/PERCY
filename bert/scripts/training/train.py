@@ -180,9 +180,9 @@ class Train(object):
                 metric = self.config["metric"]
                 patience = self.config["patience"]
                 early_stopping_callback = tf.keras.callbacks.EarlyStopping(monitor=metric,              # 1. Calculate val_loss_1 
-                                                                            min_delta = 0,                  # 2. Check val_losses for next 10 epochs 
-                                                                            patience=patience,                    # 3. Stop training if none of the val_losses are lower than val_loss_1
-                                                                            verbose=0,                      # 4. Get the trained weights corresponding to val_loss_1
+                                                                            min_delta = 0,              # 2. Check val_losses for next 10 epochs 
+                                                                            patience=patience,          # 3. Stop training if none of the val_losses are lower than val_loss_1
+                                                                            verbose=0,                  # 4. Get the trained weights corresponding to val_loss_1
                                                                             mode="auto",
                                                                             baseline=None, 
                                                                             restore_best_weights=True)
@@ -191,12 +191,12 @@ class Train(object):
                 my_callbacks.append(AdditionalValidationSets(additional_validation_datasets, self.config))
 
             model.fit(x=train_dataset[0], 
-                    y=train_dataset[1], 
-                    epochs=self.config["train_epochs"], 
-                    batch_size=self.config["mini_batch_size"], 
-                    validation_data=val_dataset, 
-                    callbacks=my_callbacks,
-                    shuffle=False)
+                        y=train_dataset[1], 
+                        epochs=self.config["train_epochs"], 
+                        batch_size=self.config["mini_batch_size"], 
+                        validation_data=val_dataset, 
+                        callbacks=my_callbacks,
+                        shuffle=False)
 
             # Save trained weights of the model
             if not os.path.exists("assets/trained_models/"+self.config["asset_name"]):

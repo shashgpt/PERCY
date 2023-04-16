@@ -1,5 +1,7 @@
 from config import *
 
+
+
 class cnn(nn.Module):
     def __init__(self, config):
         super(cnn, self).__init__()

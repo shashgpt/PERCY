@@ -13,9 +13,9 @@ if __name__=="__main__":
     np.random.seed(config["seed_value"])
     tf.random.set_seed(config["seed_value"])
 
-    from scripts.models.models import cnn
-    model = cnn(config)
-    model.summary(line_length = 150)
+    # from scripts.models.models import cnn
+    # model = cnn(config)
+    # model.summary(line_length = 150)
 
     # Create input data
     if config["create_input_data"] == True:

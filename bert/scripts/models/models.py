@@ -331,6 +331,8 @@ class CNN(Model):
 
         return out
 
+
+
 class LSTM(Model):
     def __init__(self, config, **kwargs):
         super().__init__()

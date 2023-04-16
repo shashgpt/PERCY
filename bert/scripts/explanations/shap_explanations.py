@@ -109,9 +109,14 @@ class Shap_explanations(object):
                         "SHAP_explanation":[], 
                         "SHAP_explanation_normalised":[]}
 
+        # self.model = eval(self.config["model_name"]+"(self.config)")
         for k_fold in range(1, self.config["k_samples"]+1):
             for l_fold in range(1, self.config["l_samples"]+1):
-                self.model = self.model[str(k_fold)+"_"+str(l_fold)]
+                # try:
+                #     self.model.load_weights("assets/trained_models/"+self.config["asset_name"]+"/"+self.config["asset_name"]+"_"+str(k_fold)+"_"+str(l_fold)+"_ckpt")
+                # except:
+                self.model = cnn(self.config)
+                self.model.load_weights("assets/trained_models/"+self.config["asset_name"]+"/"+self.config["asset_name"]+"_"+str(k_fold)+"_"+str(l_fold)+".h5")
                 train_dataset = datasets_nested_cv["train_dataset_"+str(k_fold)+"_"+str(l_fold)]
                 test_dataset = datasets_nested_cv["val_dataset_"+str(k_fold)+"_"+str(l_fold)]
                 train_sentences = list(train_dataset.loc[(train_dataset["rule_label"]!=0)&(train_dataset["contrast"]==1)]['sentence'])
